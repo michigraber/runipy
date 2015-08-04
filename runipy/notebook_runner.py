@@ -12,7 +12,7 @@ from time import sleep
 import logging
 import os
 
-from IPython.nbformat.current import NotebookNode
+from IPython.nbformat.current import NotebookNode, new_code_cell
 from IPython.kernel import KernelManager
 
 
@@ -36,7 +36,7 @@ class NotebookRunner(object):
     }
 
 
-    def __init__(self, nb, pylab=False, mpl_inline=False, profile_dir=None, working_dir=None):
+    def __init__(self, nb, pylab=False, mpl_inline=False, profile_dir=None, working_dir=None, params={}):
         self.km = KernelManager()
 
         args = []
@@ -77,6 +77,13 @@ class NotebookRunner(object):
             self._wait_for_ready_backport()
 
         self.nb = nb
+
+        self._set_params(**params)
+
+
+    def _set_params(self, **params):
+        paramcell = new_code_cell(input='RUNIPY_PARAMS = {0}'.format(str(params)))
+        self.run_cell(paramcell)
         
 
     def shutdown_kernel(self):
